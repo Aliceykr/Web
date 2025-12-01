@@ -351,20 +351,30 @@
         const postsList = document.getElementById('posts-list');
         const loadingMessage = document.getElementById('loading-message');
 
-        // 加载Issues列表
-        async function loadIssues() {
-            try {
-                // 隐藏加载消息，显示帖子列表
-                if (loadingMessage) loadingMessage.style.display = 'none';
-                if (postsList) postsList.style.display = 'block';
+        // 加载本地论坛帖子
+        function loadLocalPosts() {
+            // 隐藏加载消息，显示帖子列表
+            if (loadingMessage) loadingMessage.style.display = 'none';
+            if (postsList) postsList.style.display = 'block';
 
-                // 尝试多种方法获取Issues数据
-                await tryLoadIssues();
-            } catch (error) {
-                console.error('加载Issues失败:', error);
-                // 显示手动操作说明
-                showManualInstructions();
+            // 从localStorage获取帖子
+            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+
+            // 根据当前排序方式重新排序
+            if (currentSort === 'comments') {
+                // 按评论数排序（热门）
+                posts.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+            } else {
+                // 按创建时间排序（最新）
+                posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             }
+
+            displayPosts(posts);
+        }
+
+        // 保存帖子到localStorage
+        function savePosts(posts) {
+            localStorage.setItem('forumPosts', JSON.stringify(posts));
         }
 
         // 尝试多种方法加载Issues
@@ -490,62 +500,119 @@
             forumContainer.appendChild(instructionsDiv);
         }
 
-        // 显示Issues列表
-        function displayIssues(issues) {
+        // 显示帖子列表
+        function displayPosts(posts) {
             // 清空帖子列表
             if (postsList) {
                 postsList.innerHTML = '';
             }
 
-            if (issues.length === 0) {
+            if (posts.length === 0) {
                 const emptyMessage = document.createElement('div');
                 emptyMessage.style.cssText = 'text-align: center; color: white; padding: 40px;';
                 emptyMessage.innerHTML = '<h3>还没有帖子</h3><p>点击"发新帖"开始第一个讨论吧！</p>';
                 postsList.appendChild(emptyMessage);
             } else {
-                issues.forEach(issue => {
-                    const postItem = createPostItem(issue);
+                posts.forEach(post => {
+                    const postItem = createPostItem(post);
                     postsList.appendChild(postItem);
                 });
             }
         }
 
         // 创建帖子项
-        function createPostItem(issue) {
+        function createPostItem(post) {
             const postItem = document.createElement('div');
             postItem.className = 'post-item';
 
-            const createdAt = new Date(issue.created_at).toLocaleDateString('zh-CN');
-            const updatedAt = new Date(issue.updated_at).toLocaleDateString('zh-CN');
-            const comments = issue.comments;
-            const author = issue.user.login;
-
-            // 获取标签
-            const tags = issue.labels.map(label =>
-                `<span class="tag">${label.name}</span>`
-            ).join(' ');
+            const createdAt = new Date(post.createdAt).toLocaleString('zh-CN');
+            const comments = post.comments || [];
+            const author = post.author;
 
             postItem.innerHTML = `
-                <div class="post-title">${issue.title}</div>
+                <div class="post-title">${post.title}</div>
                 <div class="post-meta">
                     <div class="post-author">
                         ${author}
                     </div>
                     <div class="post-stats">
-                        ${comments}回复 | ${updatedAt} | ${issue.number}楼
+                        ${comments.length}回复 | ${createdAt}
                     </div>
                 </div>
                 <div class="post-tags">
-                    ${tags}
+                    <span class="tag">论坛</span>
                 </div>
             `;
 
-            // 点击跳转到GitHub Issue
+            // 点击查看详情和回复
             postItem.onclick = () => {
-                window.open(issue.html_url, '_blank');
+                showPostDetail(post);
             };
 
             return postItem;
+        }
+
+        // 显示帖子详情和回复功能
+        function showPostDetail(post) {
+            const detailContent = `
+                <div style="color: white; padding: 20px;">
+                    <button onclick="loadLocalPosts()" style="margin-bottom: 20px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">← 返回列表</button>
+                    <h3>${post.title}</h3>
+                    <p style="margin-bottom: 10px; opacity: 0.8;">作者: ${post.author} | ${new Date(post.createdAt).toLocaleString('zh-CN')}</p>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        ${post.content.replace(/\n/g, '<br>')}
+                    </div>
+                    <div id="comments-section">
+                        <h4>回复 (${post.comments.length})</h4>
+                        <div id="comments-list">
+                            ${post.comments.map(comment => `
+                                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                    <div style="font-weight: bold; margin-bottom: 5px;">${comment.author}</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 10px;">${new Date(comment.createdAt).toLocaleString('zh-CN')}</div>
+                                    <div>${comment.content.replace(/\n/g, '<br>')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <textarea id="new-comment" placeholder="写下你的回复..." style="width: 100%; min-height: 100px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px; border-radius: 8px; resize: vertical;"></textarea>
+                            <button onclick="addComment('${post.id}')" style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">发表回复</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (postsList) {
+                postsList.innerHTML = detailContent;
+            }
+        }
+
+        // 添加回复功能
+        function addComment(postId) {
+            const textarea = document.getElementById('new-comment');
+            const content = textarea.value.trim();
+
+            if (!content) {
+                alert('请输入回复内容！');
+                return;
+            }
+
+            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+            const postIndex = posts.findIndex(p => p.id == postId);
+
+            if (postIndex !== -1) {
+                const newComment = {
+                    id: Date.now(),
+                    content: content,
+                    author: '匿名用户',
+                    createdAt: new Date().toISOString()
+                };
+
+                posts[postIndex].comments.push(newComment);
+                savePosts(posts);
+
+                alert('回复成功！');
+                showPostDetail(posts[postIndex]); // 刷新详情页
+            }
         }
 
         // 显示示例数据（当API失败时）
@@ -577,37 +644,57 @@
             window.open(issuesUrl, '_blank');
         }
 
+        // 创建新帖子
+        function createNewPost() {
+            const title = prompt('请输入帖子标题：');
+            if (!title) return;
+
+            const content = prompt('请输入帖子内容：');
+            if (!content) return;
+
+            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+            const newPost = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                author: '匿名用户',
+                createdAt: new Date().toISOString(),
+                comments: []
+            };
+
+            posts.unshift(newPost); // 添加到开头
+            savePosts(posts);
+            loadLocalPosts(); // 重新显示
+
+            alert('发帖成功！');
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 绑定所有按钮
             const newPostBtn = document.getElementById('new-post-btn');
-            const viewAllBtn = document.getElementById('view-all-btn');
             const hotBtn = document.getElementById('hot-btn');
             const latestBtn = document.getElementById('latest-btn');
 
             if (newPostBtn) {
-                newPostBtn.onclick = createNewIssue;
-            }
-
-            if (viewAllBtn) {
-                viewAllBtn.onclick = viewAllPosts;
+                newPostBtn.onclick = createNewPost;
             }
 
             if (hotBtn) {
                 hotBtn.onclick = () => {
                     currentSort = 'comments'; // 按评论数排序
-                    loadIssues();
+                    loadLocalPosts();
                 };
             }
 
             if (latestBtn) {
                 latestBtn.onclick = () => {
-                    currentSort = 'updated'; // 按更新时间排序
-                    loadIssues();
+                    currentSort = 'updated'; // 按时间排序
+                    loadLocalPosts();
                 };
             }
 
-            // 加载Issues
+            // 加载帖子
             loadIssues();
         });
     </script>
