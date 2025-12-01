@@ -318,7 +318,8 @@
                     <h2 class="forum-title">主页论坛</h2>
                     <div class="forum-controls">
                         <a href="#" class="control-button" id="new-post-btn">发新帖</a>
-                        <a href="#" class="control-button" id="view-all-btn">查看所有帖子</a>
+                        <a href="#" class="control-button" id="export-btn">导出数据</a>
+                        <a href="#" class="control-button" id="import-btn">导入数据</a>
                         <a href="#" class="control-button" id="hot-btn">热门</a>
                         <a href="#" class="control-button" id="latest-btn">最新</a>
                     </div>
@@ -666,18 +667,84 @@
             savePosts(posts);
             loadLocalPosts(); // 重新显示
 
-            alert('发帖成功！');
+            alert('发帖成功！\n\n重要提示：数据存储在浏览器中，清除缓存会丢失！\n请点击"导出数据"备份！');
+        }
+
+        // 导出数据
+        function exportData() {
+            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+
+            if (posts.length === 0) {
+                alert('没有数据可以导出！');
+                return;
+            }
+
+            const dataStr = JSON.stringify(posts, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `论坛数据_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
+            link.click();
+
+            alert(`导出成功！\n\n已导出 ${posts.length} 个帖子到文件`);
+        }
+
+        // 导入数据
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedPosts = JSON.parse(e.target.result);
+
+                        if (!Array.isArray(importedPosts)) {
+                            alert('文件格式错误！');
+                            return;
+                        }
+
+                        if (confirm(`即将导入 ${importedPosts.length} 个帖子，是否继续？\n\n注意：这将覆盖现有数据！`)) {
+                            localStorage.setItem('forumPosts', JSON.stringify(importedPosts));
+                            loadLocalPosts();
+                            alert('导入成功！');
+                        }
+                    } catch (error) {
+                        alert('文件读取失败！');
+                    }
+                };
+
+                reader.readAsText(file);
+            };
+
+            input.click();
         }
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 绑定所有按钮
             const newPostBtn = document.getElementById('new-post-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const importBtn = document.getElementById('import-btn');
             const hotBtn = document.getElementById('hot-btn');
             const latestBtn = document.getElementById('latest-btn');
 
             if (newPostBtn) {
                 newPostBtn.onclick = createNewPost;
+            }
+
+            if (exportBtn) {
+                exportBtn.onclick = exportData;
+            }
+
+            if (importBtn) {
+                importBtn.onclick = importData;
             }
 
             if (hotBtn) {
@@ -696,6 +763,14 @@
 
             // 加载帖子
             loadIssues();
+
+            // 显示数据提示
+            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+            if (posts.length > 0) {
+                setTimeout(() => {
+                    alert(`当前有 ${posts.length} 个帖子\n重要提示：数据存储在浏览器中，清除缓存会丢失！\n请定期使用"导出数据"功能备份！`);
+                }, 1000);
+            }
         });
     </script>
 </body>
