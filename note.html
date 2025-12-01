@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新海天的后宫</title>
+    <title>小说 - 新海天的后宫</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -72,7 +72,6 @@
             position: relative;
             overflow: hidden;
             text-decoration: none;
-            display: block;
         }
 
         .nav-button::before {
@@ -105,27 +104,21 @@
             transform: translateX(5px) scale(0.95);
         }
 
-        .footer-text {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            font-family: 'Ma Shan Zheng', cursive;
-            z-index: 10;
-            line-height: 1.4;
-            white-space: nowrap;
-            text-align: right;
-        }
-
         .content {
             margin-left: 220px;
             flex: 1;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             padding: 40px 20px;
+        }
+
+        .welcome-text {
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            opacity: 0.8;
         }
 
         @keyframes fadeIn {
@@ -158,6 +151,10 @@
                 font-size: 1.3rem;
                 padding: 18px 20px;
             }
+
+            .welcome-text {
+                font-size: 1.5rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -180,35 +177,31 @@
                 padding: 15px 12px;
             }
 
-            .footer-text {
-                font-size: 0.75rem;
-                bottom: 15px;
-                right: 15px;
-                max-width: 150px;
+            .welcome-text {
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="title">新海天的后宫</h1>
+        <h1 class="title">小说</h1>
     </div>
 
     <div class="main-container">
         <div class="sidebar">
-            <a href="#" class="nav-button">游戏</a>
-            <a href="#" class="nav-button">轻小说</a>
-            <a href="#" class="nav-button">漫画</a>
-            <a href="note.html" class="nav-button">小说</a>
+            <a href="#" class="nav-button">ESJ</a>
+            <a href="#" class="nav-button">真白萌</a>
+            <a href="#" class="nav-button">轻之国度</a>
+            <a href="#" class="nav-button">待添加</a>
         </div>
 
         <div class="content">
-            <!-- 主要内容区域 -->
+            <div class="welcome-text">
+                欢迎来到小说世界<br>
+                请选择左侧的小说站点
+            </div>
         </div>
-    </div>
-
-    <div class="footer-text">
-        武汉纺织大学某小众宝藏同好会唯一指定网站
     </div>
 </body>
 </html>
