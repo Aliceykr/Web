@@ -16,7 +16,7 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             font-family: 'Ma Shan Zheng', cursive;
             display: flex;
             flex-direction: column;
@@ -29,10 +29,10 @@
         }
 
         .title {
-            font-size: 3rem;
+            font-size: 4.5rem;
             color: white;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.1em;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.15em;
             animation: fadeIn 2s ease-in-out;
         }
 
@@ -47,23 +47,23 @@
             left: 0;
             top: 0;
             height: 100vh;
-            width: 200px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            width: 220px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
             display: flex;
             flex-direction: column;
-            padding: 100px 20px 20px;
-            gap: 20px;
+            padding: 120px 25px 20px;
+            gap: 25px;
             z-index: 1;
         }
 
         .nav-button {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.25);
             color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 1.2rem;
+            padding: 20px 25px;
+            border-radius: 12px;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
@@ -102,7 +102,7 @@
         }
 
         .content {
-            margin-left: 200px;
+            margin-left: 220px;
             flex: 1;
             display: flex;
             justify-content: center;
@@ -123,41 +123,43 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                width: 160px;
-                padding: 80px 15px 20px;
+                width: 180px;
+                padding: 100px 20px 20px;
+                gap: 20px;
             }
 
             .content {
-                margin-left: 160px;
+                margin-left: 180px;
             }
 
             .title {
-                font-size: 2rem;
+                font-size: 3rem;
             }
 
             .nav-button {
-                font-size: 1rem;
-                padding: 12px 15px;
+                font-size: 1.3rem;
+                padding: 18px 20px;
             }
         }
 
         @media (max-width: 480px) {
             .sidebar {
-                width: 120px;
-                padding: 70px 10px 20px;
+                width: 140px;
+                padding: 90px 15px 20px;
+                gap: 15px;
             }
 
             .content {
-                margin-left: 120px;
+                margin-left: 140px;
             }
 
             .title {
-                font-size: 1.5rem;
+                font-size: 2.2rem;
             }
 
             .nav-button {
-                font-size: 0.9rem;
-                padding: 10px 8px;
+                font-size: 1.1rem;
+                padding: 15px 12px;
             }
         }
     </style>
