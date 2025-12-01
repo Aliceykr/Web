@@ -319,92 +319,19 @@
                     <div class="forum-controls">
                         <a href="#" class="control-button">发新帖</a>
                         <a href="#" class="control-button" id="refresh-btn">刷新</a>
-                        <a href="#" class="control-button">热门</a>
-                        <a href="#" class="control-button">最新</a>
+                        <a href="#" class="control-button" id="hot-btn">热门</a>
+                        <a href="#" class="control-button" id="latest-btn">最新</a>
                     </div>
                 </div>
 
-                <div class="post-item">
-                    <div class="post-title">最近在读的几本轻小说推荐</div>
-                    <div class="post-meta">
-                        <div class="post-author">
-                            新海天
-                        </div>
-                        <div class="post-stats">
-                            15回复 | 2小时前 | 128浏览
-                        </div>
-                    </div>
-                    <div class="post-tags">
-                        <span class="tag">轻小说</span>
-                        <span class="tag">推荐</span>
-                        <span class="tag">精华</span>
-                    </div>
-                </div>
-
-                <div class="post-item">
-                    <div class="post-title">ESJ站点最近怎么样？</div>
-                    <div class="post-meta">
-                        <div class="post-author">
-                            匿名用户
-                        </div>
-                        <div class="post-stats">
-                            8回复 | 5小时前 | 67浏览
-                        </div>
-                    </div>
-                    <div class="post-tags">
-                        <span class="tag">讨论</span>
-                        <span class="tag">站点</span>
-                    </div>
-                </div>
-
-                <div class="post-item">
-                    <div class="post-title">求推荐类似《刀剑神域》的轻小说</div>
-                    <div class="post-meta">
-                        <div class="post-author">
-                            轻小说爱好者
-                        </div>
-                        <div class="post-stats">
-                            23回复 | 1天前 | 256浏览
-                        </div>
-                    </div>
-                    <div class="post-tags">
-                        <span class="tag">求推荐</span>
-                        <span class="tag">游戏异世界</span>
-                    </div>
-                </div>
-
-                <div class="post-item">
-                    <div class="post-title">真白萌和ESJ哪个更好用？</div>
-                    <div class="post-meta">
-                        <div class="post-author">
-                            新手小白
-                        </div>
-                        <div class="post-stats">
-                            12回复 | 2天前 | 145浏览
-                        </div>
-                    </div>
-                    <div class="post-tags">
-                        <span class="tag">求助</span>
-                        <span class="tag">使用技巧</span>
-                    </div>
-                </div>
-
-                <div class="post-item">
-                    <div class="post-title">轻之国度现在还稳定吗？</div>
-                    <div class="post-meta">
-                        <div class="post-author">
-                            老司机
-                        </div>
-                        <div class="post-stats">
-                            6回复 | 3天前 | 89浏览
-                        </div>
-                    </div>
-                    <div class="post-tags">
-                        <span class="tag">询问</span>
-                        <span class="tag">站点状态</span>
-                    </div>
-                </div>
+            <div id="posts-list" style="display: none;">
+                <!-- 帖子将通过JavaScript动态加载 -->
             </div>
+
+            <div id="loading-message" style="text-align: center; color: white; padding: 40px;">
+                <p>正在加载论坛帖子...</p>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -417,13 +344,20 @@
         const GITHUB_OWNER = 'Aliceykr';
         const GITHUB_REPO = 'Web';
         const ISSUES_LABEL = '论坛'; // 用于标识论坛帖子的标签
+        let currentSort = 'updated'; // 默认按时间排序
 
         // DOM元素
         const forumContainer = document.querySelector('.forum-container');
+        const postsList = document.getElementById('posts-list');
+        const loadingMessage = document.getElementById('loading-message');
 
         // 加载Issues列表
         async function loadIssues() {
             try {
+                // 隐藏加载消息，显示帖子列表
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                if (postsList) postsList.style.display = 'block';
+
                 // 使用GitHub API，添加缓存破坏参数
                 const cacheBuster = Date.now();
                 const response = await fetch(
@@ -440,7 +374,17 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const issues = await response.json();
+                let issues = await response.json();
+
+                // 根据当前排序方式重新排序
+                if (currentSort === 'comments') {
+                    // 按评论数排序（热门）
+                    issues.sort((a, b) => b.comments - a.comments);
+                } else {
+                    // 按更新时间排序（最新）
+                    issues.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                }
+
                 displayIssues(issues);
             } catch (error) {
                 console.error('加载Issues失败:', error);
@@ -477,19 +421,20 @@
 
         // 显示Issues列表
         function displayIssues(issues) {
-            // 先移除现有的示例帖子
-            const existingPosts = forumContainer.querySelectorAll('.post-item');
-            existingPosts.forEach(post => post.remove());
+            // 清空帖子列表
+            if (postsList) {
+                postsList.innerHTML = '';
+            }
 
             if (issues.length === 0) {
                 const emptyMessage = document.createElement('div');
                 emptyMessage.style.cssText = 'text-align: center; color: white; padding: 40px;';
                 emptyMessage.innerHTML = '<h3>还没有帖子</h3><p>点击"发新帖"开始第一个讨论吧！</p>';
-                forumContainer.appendChild(emptyMessage);
+                postsList.appendChild(emptyMessage);
             } else {
                 issues.forEach(issue => {
                     const postItem = createPostItem(issue);
-                    forumContainer.appendChild(postItem);
+                    postsList.appendChild(postItem);
                 });
             }
         }
@@ -563,6 +508,16 @@
                 if (btn.id === 'refresh-btn') {
                     btn.onclick = () => {
                         loadIssues(); // 重新加载Issues
+                    };
+                } else if (btn.id === 'hot-btn') {
+                    btn.onclick = () => {
+                        currentSort = 'comments'; // 按评论数排序
+                        loadIssues();
+                    };
+                } else if (btn.id === 'latest-btn') {
+                    btn.onclick = () => {
+                        currentSort = 'updated'; // 按更新时间排序
+                        loadIssues();
                     };
                 } else if (index === 0) { // 第一个按钮是"发新帖"
                     btn.onclick = createNewIssue;
