@@ -317,8 +317,8 @@
                 <div class="forum-header">
                     <h2 class="forum-title">主页论坛</h2>
                     <div class="forum-controls">
-                        <a href="#" class="control-button">发新帖</a>
-                        <a href="#" class="control-button" id="refresh-btn">刷新</a>
+                        <a href="#" class="control-button" id="new-post-btn">发新帖</a>
+                        <a href="#" class="control-button" id="view-all-btn">查看所有帖子</a>
                         <a href="#" class="control-button" id="hot-btn">热门</a>
                         <a href="#" class="control-button" id="latest-btn">最新</a>
                     </div>
@@ -358,38 +358,109 @@
                 if (loadingMessage) loadingMessage.style.display = 'none';
                 if (postsList) postsList.style.display = 'block';
 
-                // 使用GitHub API，添加缓存破坏参数
-                const cacheBuster = Date.now();
+                // 尝试多种方法获取Issues数据
+                await tryLoadIssues();
+            } catch (error) {
+                console.error('加载Issues失败:', error);
+                // 显示手动操作说明
+                showManualInstructions();
+            }
+        }
+
+        // 尝试多种方法加载Issues
+        async function tryLoadIssues() {
+            // 方法1: 尝试 GitHub API
+            try {
                 const response = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=${ISSUES_LABEL}&state=open&sort=updated&direction=desc&_=${cacheBuster}`,
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=${ISSUES_LABEL}&state=open&sort=updated&direction=desc`,
                     {
                         headers: {
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Cache-Control': 'no-cache'
+                            'Accept': 'application/vnd.github.v3+json'
                         }
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (response.ok) {
+                    let issues = await response.json();
+                    sortAndDisplayIssues(issues);
+                    return;
                 }
+            } catch (e) {
+                console.log('GitHub API失败，尝试其他方法');
+            }
 
-                let issues = await response.json();
+            // 方法2: 尝试直接访问GitHub Issues页面
+            try {
+                const response = await fetch(
+                    `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/issues.json`
+                );
 
-                // 根据当前排序方式重新排序
-                if (currentSort === 'comments') {
-                    // 按评论数排序（热门）
-                    issues.sort((a, b) => b.comments - a.comments);
-                } else {
-                    // 按更新时间排序（最新）
-                    issues.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                if (response.ok) {
+                    const issuesData = await response.json();
+                    sortAndDisplayIssues(issuesData);
+                    return;
                 }
+            } catch (e) {
+                console.log('JSON文件方法失败');
+            }
 
-                displayIssues(issues);
-            } catch (error) {
-                console.error('加载Issues失败:', error);
-                // 如果API失败，显示示例数据并提示用户
-                showSampleDataWithInstructions();
+            // 所有方法都失败
+            throw new Error('所有加载方法都失败');
+        }
+
+        // 排序并显示Issues
+        function sortAndDisplayIssues(issues) {
+            // 根据当前排序方式重新排序
+            if (currentSort === 'comments') {
+                // 按评论数排序（热门）
+                issues.sort((a, b) => (b.comments || 0) - (a.comments || 0));
+            } else {
+                // 按更新时间排序（最新）
+                issues.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+            }
+
+            displayIssues(issues);
+        }
+
+        // 显示手动操作说明
+        function showManualInstructions() {
+            const instructionsDiv = document.createElement('div');
+            instructionsDiv.style.cssText = 'text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 15px; margin: 20px 0; backdrop-filter: blur(10px);';
+            instructionsDiv.innerHTML = `
+                <h3 style="margin-bottom: 20px; font-size: 2rem;">论坛访问说明</h3>
+                <p style="margin-bottom: 20px; font-size: 1.2rem;">由于浏览器安全限制，需要手动查看论坛帖子</p>
+
+                <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+                    <button onclick="window.open('https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?labels=${ISSUES_LABEL}', '_blank')"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-family: 'Ma Shan Zheng', cursive; transition: all 0.3s ease;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        📝 发新帖
+                    </button>
+
+                    <button onclick="window.open('https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues?q=label:${ISSUES_LABEL}', '_blank')"
+                            style="background: linear-gradient(135deg, #4facfe 0%, #667eea 100%); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-family: 'Ma Shan Zheng', cursive; transition: all 0.3s ease;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        📋 查看所有帖子
+                    </button>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; text-align: left; display: inline-block;">
+                    <h4 style="margin-bottom: 15px;">使用步骤：</h4>
+                    <ol style="line-height: 1.8;">
+                        <li>点击"发新帖"按钮创建新的讨论主题</li>
+                        <li>记得在GitHub中添加"论坛"标签</li>
+                        <li>点击"查看所有帖子"浏览现有讨论</li>
+                        <li>在GitHub中可以直接回复和参与讨论</li>
+                    </ol>
+                </div>
+            `;
+
+            // 清空并显示说明
+            if (postsList) {
+                postsList.innerHTML = '';
+                postsList.appendChild(instructionsDiv);
             }
         }
 
@@ -500,33 +571,41 @@
             window.open(issueUrl, '_blank');
         }
 
+        // 查看所有帖子功能
+        function viewAllPosts() {
+            const issuesUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues?q=label:${ISSUES_LABEL}`;
+            window.open(issuesUrl, '_blank');
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 绑定所有按钮
-            const controlBtns = document.querySelectorAll('.control-button');
-            controlBtns.forEach((btn, index) => {
-                if (btn.id === 'refresh-btn') {
-                    btn.onclick = () => {
-                        loadIssues(); // 重新加载Issues
-                    };
-                } else if (btn.id === 'hot-btn') {
-                    btn.onclick = () => {
-                        currentSort = 'comments'; // 按评论数排序
-                        loadIssues();
-                    };
-                } else if (btn.id === 'latest-btn') {
-                    btn.onclick = () => {
-                        currentSort = 'updated'; // 按更新时间排序
-                        loadIssues();
-                    };
-                } else if (index === 0) { // 第一个按钮是"发新帖"
-                    btn.onclick = createNewIssue;
-                } else {
-                    btn.onclick = () => {
-                        alert(`功能开发中: ${btn.textContent}`);
-                    };
-                }
-            });
+            const newPostBtn = document.getElementById('new-post-btn');
+            const viewAllBtn = document.getElementById('view-all-btn');
+            const hotBtn = document.getElementById('hot-btn');
+            const latestBtn = document.getElementById('latest-btn');
+
+            if (newPostBtn) {
+                newPostBtn.onclick = createNewIssue;
+            }
+
+            if (viewAllBtn) {
+                viewAllBtn.onclick = viewAllPosts;
+            }
+
+            if (hotBtn) {
+                hotBtn.onclick = () => {
+                    currentSort = 'comments'; // 按评论数排序
+                    loadIssues();
+                };
+            }
+
+            if (latestBtn) {
+                latestBtn.onclick = () => {
+                    currentSort = 'updated'; // 按更新时间排序
+                    loadIssues();
+                };
+            }
 
             // 加载Issues
             loadIssues();
