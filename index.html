@@ -102,6 +102,20 @@
             transform: translateX(5px) scale(0.95);
         }
 
+        .footer-text {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-family: 'Ma Shan Zheng', cursive;
+            z-index: 10;
+            line-height: 1.4;
+            max-width: 200px;
+            text-align: right;
+        }
+
         .content {
             margin-left: 220px;
             flex: 1;
@@ -162,6 +176,13 @@
                 font-size: 1.1rem;
                 padding: 15px 12px;
             }
+
+            .footer-text {
+                font-size: 0.75rem;
+                bottom: 15px;
+                right: 15px;
+                max-width: 150px;
+            }
         }
     </style>
 </head>
@@ -181,6 +202,10 @@
         <div class="content">
             <!-- 主要内容区域 -->
         </div>
+    </div>
+
+    <div class="footer-text">
+        武汉纺织大学某小众宝藏同好会唯一指定网站
     </div>
 </body>
 </html>
