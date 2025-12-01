@@ -36,6 +36,55 @@
             animation: fadeIn 2s ease-in-out;
         }
 
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Ma Shan Zheng', cursive;
+            text-decoration: none;
+            z-index: 100;
+            display: block;
+        }
+
+        .home-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+
+        .home-button:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .home-button:active {
+            transform: scale(1.05) scale(0.95);
+        }
+
         .main-container {
             display: flex;
             flex: 1;
@@ -184,6 +233,8 @@
     </style>
 </head>
 <body>
+    <a href="index.html" class="home-button">主页</a>
+
     <div class="header">
         <h1 class="title">轻小说</h1>
     </div>
