@@ -318,9 +318,9 @@
                     <h2 class="forum-title">主页论坛</h2>
                     <div class="forum-controls">
                         <a href="#" class="control-button">发新帖</a>
+                        <a href="#" class="control-button" id="refresh-btn">刷新</a>
                         <a href="#" class="control-button">热门</a>
                         <a href="#" class="control-button">最新</a>
-                        <a href="#" class="control-button">精华</a>
                     </div>
                 </div>
 
@@ -424,8 +424,16 @@
         // 加载Issues列表
         async function loadIssues() {
             try {
+                // 使用GitHub API，添加缓存破坏参数
+                const cacheBuster = Date.now();
                 const response = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=${ISSUES_LABEL}&state=open&sort=updated&direction=desc`
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=${ISSUES_LABEL}&state=open&sort=updated&direction=desc&_=${cacheBuster}`,
+                    {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    }
                 );
 
                 if (!response.ok) {
@@ -436,9 +444,35 @@
                 displayIssues(issues);
             } catch (error) {
                 console.error('加载Issues失败:', error);
-                // 如果API失败，显示示例数据
-                showSampleData();
+                // 如果API失败，显示示例数据并提示用户
+                showSampleDataWithInstructions();
             }
+        }
+
+        // 显示示例数据（带说明）
+        function showSampleDataWithInstructions() {
+            const instructionsDiv = document.createElement('div');
+            instructionsDiv.style.cssText = 'text-align: center; color: white; padding: 40px; background: rgba(255,0,0,0.1); border-radius: 10px; margin: 20px 0;';
+            instructionsDiv.innerHTML = `
+                <h3>API访问受限</h3>
+                <p>由于浏览器安全限制，无法直接获取GitHub Issues。</p>
+                <p>请按以下步骤操作：</p>
+                <ol style="text-align: left; display: inline-block;">
+                    <li>点击"发新帖"在GitHub中发布帖子</li>
+                    <li>点击"刷新"按钮更新帖子列表</li>
+                    <li>或者直接访问 <a href="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues" target="_blank" style="color: #4facfe;">GitHub Issues页面</a></li>
+                </ol>
+                <button onclick="window.open('https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues', '_blank')"
+                        style="background: #4facfe; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                    访问GitHub Issues
+                </button>
+            `;
+
+            // 移除现有帖子
+            const existingPosts = forumContainer.querySelectorAll('.post-item');
+            existingPosts.forEach(post => post.remove());
+
+            forumContainer.appendChild(instructionsDiv);
         }
 
         // 显示Issues列表
@@ -523,10 +557,14 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 绑定发新帖按钮
-            const newPostBtns = document.querySelectorAll('.control-button');
-            newPostBtns.forEach((btn, index) => {
-                if (index === 0) { // 第一个按钮是"发新帖"
+            // 绑定所有按钮
+            const controlBtns = document.querySelectorAll('.control-button');
+            controlBtns.forEach((btn, index) => {
+                if (btn.id === 'refresh-btn') {
+                    btn.onclick = () => {
+                        loadIssues(); // 重新加载Issues
+                    };
+                } else if (index === 0) { // 第一个按钮是"发新帖"
                     btn.onclick = createNewIssue;
                 } else {
                     btn.onclick = () => {
