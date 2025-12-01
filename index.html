@@ -105,6 +105,116 @@
             transform: translateX(5px) scale(0.95);
         }
 
+        .forum-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .forum-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .forum-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .post-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
         .footer-text {
             position: fixed;
             bottom: 20px;
@@ -203,7 +313,98 @@
         </div>
 
         <div class="content">
-            <!-- 主要内容区域 -->
+            <div class="forum-container">
+                <div class="forum-header">
+                    <h2 class="forum-title">📝 轻小说论坛</h2>
+                    <div class="forum-controls">
+                        <a href="#" class="control-button">📝 发新帖</a>
+                        <a href="#" class="control-button">🔥 热门</a>
+                        <a href="#" class="control-button">🆕 最新</a>
+                        <a href="#" class="control-button">⭐ 精华</a>
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <div class="post-title">📌 最近在读的几本轻小说推荐</div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            👤 新海天
+                        </div>
+                        <div class="post-stats">
+                            💬 15回复 | ⏰ 2小时前 | 👁️ 128浏览
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">📚 轻小说</span>
+                        <span class="tag">👍 推荐</span>
+                        <span class="tag">💎 精华</span>
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <div class="post-title">📌 ESJ站点最近怎么样？</div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            👤 匿名用户
+                        </div>
+                        <div class="post-stats">
+                            💬 8回复 | ⏰ 5小时前 | 👁️ 67浏览
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">💬 讨论</span>
+                        <span class="tag">🌐 站点</span>
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <div class="post-title">📌 求推荐类似《刀剑神域》的轻小说</div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            👤 轻小说爱好者
+                        </div>
+                        <div class="post-stats">
+                            💬 23回复 | ⏰ 1天前 | 👁️ 256浏览
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">🙋 求推荐</span>
+                        <span class="tag">⚔️ 游戏异世界</span>
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <div class="post-title">📌 真白萌和ESJ哪个更好用？</div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            👤 新手小白
+                        </div>
+                        <div class="post-stats">
+                            💬 12回复 | ⏰ 2天前 | 👁️ 145浏览
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">❓ 求助</span>
+                        <span class="tag">🔧 使用技巧</span>
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <div class="post-title">📌 轻之国度现在还稳定吗？</div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            👤 老司机
+                        </div>
+                        <div class="post-stats">
+                            💬 6回复 | ⏰ 3天前 | 👁️ 89浏览
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">🔍 询问</span>
+                        <span class="tag">📱 站点状态</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
