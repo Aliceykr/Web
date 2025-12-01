@@ -352,25 +352,37 @@
         const postsList = document.getElementById('posts-list');
         const loadingMessage = document.getElementById('loading-message');
 
-        // 加载本地论坛帖子
-        function loadLocalPosts() {
+        // 加载GitHub Issues作为论坛帖子
+        async function loadForumPosts() {
             // 隐藏加载消息，显示帖子列表
             if (loadingMessage) loadingMessage.style.display = 'none';
             if (postsList) postsList.style.display = 'block';
 
-            // 从localStorage获取帖子
-            const posts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+            try {
+                // 尝试读取GitHub仓库中的论坛数据文件
+                const response = await fetch('https://raw.githubusercontent.com/Aliceykr/Web/main/forum-data.json?t=' + Date.now());
 
-            // 根据当前排序方式重新排序
-            if (currentSort === 'comments') {
-                // 按评论数排序（热门）
-                posts.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
-            } else {
-                // 按创建时间排序（最新）
-                posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                if (response.ok) {
+                    const posts = await response.json();
+                    console.log('成功加载论坛数据:', posts.length, '个帖子');
+
+                    // 根据当前排序方式重新排序
+                    if (currentSort === 'comments') {
+                        // 按评论数排序（热门）
+                        posts.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+                    } else {
+                        // 按更新时间排序（最新）
+                        posts.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+                    }
+
+                    displayPosts(posts);
+                } else {
+                    throw new Error('无法加载论坛数据');
+                }
+            } catch (error) {
+                console.error('加载论坛数据失败:', error);
+                showBackupPlan();
             }
-
-            displayPosts(posts);
         }
 
         // 保存帖子到localStorage
@@ -616,21 +628,47 @@
             }
         }
 
-        // 显示示例数据（当API失败时）
-        function showSampleData() {
-            const sampleIssues = [
-                {
-                    title: 'API连接失败 - 显示示例帖子',
-                    html_url: 'https://github.com/Aliceykr/Web/issues',
-                    user: { login: '系统消息' },
-                    comments: 0,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    number: 1,
-                    labels: []
-                }
-            ];
-            displayIssues(sampleIssues);
+        // 显示论坛使用说明
+        function showBackupPlan() {
+            const instructionsDiv = document.createElement('div');
+            instructionsDiv.style.cssText = 'text-align: center; color: white; padding: 40px; background: rgba(0,0,0,0.3); border-radius: 15px; margin: 20px 0; backdrop-filter: blur(10px);';
+            instructionsDiv.innerHTML = `
+                <h3 style="margin-bottom: 20px; font-size: 2rem;">论坛使用说明</h3>
+                <p style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.6;">
+                    这是一个基于GitHub Issues的论坛系统！<br>
+                    所有发帖和回复都会自动同步到GitHub仓库。
+                </p>
+                <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+                    <a href="https://github.com/Aliceykr/Web/issues/new?labels=论坛" target="_blank"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-family: 'Ma Shan Zheng', cursive; transition: all 0.3s ease; text-decoration: none; display: inline-block;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        📝 发新帖
+                    </a>
+                    <a href="https://github.com/Aliceykr/Web/issues?q=label:论坛" target="_blank"
+                            style="background: linear-gradient(135deg, #4facfe 0%, #667eea 100%); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-family: 'Ma Shan Zheng', cursive; transition: all 0.3s ease; text-decoration: none; display: inline-block;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        📋 查看帖子
+                    </a>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: left; display: inline-block;">
+                    <h4 style="margin-bottom: 15px;">使用步骤：</h4>
+                    <ol style="line-height: 1.8; font-size: 1.1rem;">
+                        <li>点击"发新帖"在GitHub创建新的讨论</li>
+                        <li>记得添加"论坛"标签</li>
+                        <li>发表评论参与讨论</li>
+                        <li>数据会自动同步到网站（延迟1-2分钟）</li>
+                        <li>点击"查看帖子"浏览所有讨论</li>
+                    </ol>
+                </div>
+            `;
+
+            // 清空并显示说明
+            if (postsList) {
+                postsList.innerHTML = '';
+                postsList.appendChild(instructionsDiv);
+            }
         }
 
         // 发新帖功能
@@ -750,14 +788,14 @@
             if (hotBtn) {
                 hotBtn.onclick = () => {
                     currentSort = 'comments'; // 按评论数排序
-                    loadLocalPosts();
+                    loadForumPosts();
                 };
             }
 
             if (latestBtn) {
                 latestBtn.onclick = () => {
                     currentSort = 'updated'; // 按时间排序
-                    loadLocalPosts();
+                    loadForumPosts();
                 };
             }
 

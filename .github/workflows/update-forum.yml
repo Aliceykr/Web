@@ -1,0 +1,87 @@
+name: Update Forum Data
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited, labeled, unlabeled]
+  issue_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  update-forum:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Fetch Forum Issues
+      run: |
+        # 获取带"论坛"标签的Issues
+        curl -H "Accept: application/vnd.github.v3+json" \
+             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+             "https://api.github.com/repos/${{ github.repository }}/issues?labels=论坛&state=open" \
+             > forum-issues.json
+
+    - name: Process and Save Data
+      run: |
+        # 处理Issues数据并保存到文件
+        node -e "
+        const fs = require('fs');
+
+        try {
+          const raw = fs.readFileSync('forum-issues.json', 'utf8');
+          const issues = JSON.parse(raw);
+
+          // 处理每个Issue，包括评论
+          const forumData = issues.map(issue => {
+            // 获取评论
+            const comments = issue.comments || [];
+            const processedComments = comments.map(comment => ({
+              id: comment.id,
+              author: comment.user.login,
+              content: comment.body,
+              createdAt: comment.created_at
+            }));
+
+            return {
+              id: issue.id,
+              title: issue.title,
+              content: issue.body,
+              author: issue.user.login,
+              createdAt: issue.created_at,
+              updatedAt: issue.updated_at,
+              comments: processedComments,
+              labels: issue.labels.map(label => label.name)
+            };
+          });
+
+          // 写入到论坛数据文件
+          fs.writeFileSync('forum-data.json', JSON.stringify(forumData, null, 2));
+          console.log(\`成功处理 \${forumData.length} 个论坛帖子\`);
+
+        } catch (error) {
+          console.error('处理失败:', error);
+          // 创建空数据文件
+          fs.writeFileSync('forum-data.json', '[]');
+        }
+        "
+
+    - name: Commit and Push
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add forum-data.json
+        if git diff --staged --quiet; then
+          git commit -m "自动更新论坛数据"
+          git push
+        else
+          echo "没有变更需要提交"
+        fi
