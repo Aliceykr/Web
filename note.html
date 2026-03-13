@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -6,8 +6,23 @@
     <title>轻小说 - 新海天的后宫</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --blue: #1a73e8;
+            --red: #d93025;
+            --yellow: #f9ab00;
+            --green: #188038;
+            --ink: #1f1f1f;
+            --muted: #5f6368;
+            --surface: #ffffff;
+            --surface-2: #f6f8fb;
+            --surface-3: #eef2f7;
+            --shadow-1: 0 10px 30px rgba(31, 31, 31, 0.12);
+            --shadow-2: 0 18px 50px rgba(31, 31, 31, 0.18);
+            --ring: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,242 +31,539 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #4facfe 0%, #667eea 50%, #764ba2 100%);
-            font-family: 'Ma Shan Zheng', cursive;
+            font-family: 'Noto Sans SC', 'Noto Sans', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(900px 600px at 8% -10%, rgba(26, 115, 232, 0.18), transparent 60%),
+                radial-gradient(900px 700px at 96% 6%, rgba(217, 48, 37, 0.16), transparent 60%),
+                radial-gradient(900px 650px at 50% 115%, rgba(24, 128, 56, 0.16), transparent 60%),
+                linear-gradient(180deg, #f7f6f1 0%, #f3f6fb 60%, #f8f3ed 100%);
+            background-attachment: fixed;
             display: flex;
             flex-direction: column;
         }
 
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            z-index: 2;
-        }
-
-        .title {
-            font-size: 4.5rem;
-            color: white;
-            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
-            letter-spacing: 0.15em;
-            animation: fadeIn 2s ease-in-out;
-        }
-
-        .home-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-family: 'Ma Shan Zheng', cursive;
-            text-decoration: none;
-            z-index: 100;
-            display: block;
-        }
-
-        .home-button::before {
+        body::before {
             content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .home-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            text-decoration: none;
-        }
-
-        .home-button:hover::before {
-            width: 200px;
-            height: 200px;
-        }
-
-        .home-button:active {
-            transform: scale(1.05) scale(0.95);
-        }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            position: relative;
-        }
-
-        .sidebar {
             position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: 220px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(15px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 25px;
-            gap: 25px;
+            inset: 0;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 1px);
+            background-size: 26px 26px;
+            opacity: 0.08;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: -20% -10% -20% -10%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.35));
+            opacity: 0.28;
+            filter: blur(12px);
+            animation: sheen 18s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            isolation: isolate;
+            flex: 1;
             z-index: 1;
         }
 
-        .nav-button {
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.25);
-            color: white;
-            padding: 20px 25px;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-family: 'Ma Shan Zheng', cursive;
+        a {
+            color: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            backdrop-filter: blur(16px) saturate(140%);
+            background: rgba(255, 255, 255, 0.78);
+            border-bottom: 1px solid rgba(31, 31, 31, 0.08);
+        }
+
+        .topbar-inner {
+            width: min(1200px, 100% - 48px);
+            margin: 0 auto;
+            padding: 18px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-mark span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .dot-blue { background: var(--blue); }
+        .dot-red { background: var(--red); }
+        .dot-yellow { background: var(--yellow); }
+        .dot-green { background: var(--green); }
+
+        .brand-title {
+            font-family: 'Noto Serif SC', 'Noto Serif', serif;
+            font-size: 1.6rem;
+            letter-spacing: 0.18em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.9rem;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+        }
+
+        .home-button {
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(31, 31, 31, 0.12);
+            background: var(--surface);
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-1);
+        }
+
+        .home-button:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .hero {
+            padding: 28px 0 8px;
+        }
+
+        .hero-card {
+            width: min(1200px, 100% - 48px);
+            margin: 0 auto;
+            padding: 26px 32px;
+            border-radius: 26px;
+            background:
+                linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(120deg, rgba(26, 115, 232, 0.4), rgba(249, 171, 0, 0.4), rgba(24, 128, 56, 0.4)) border-box;
+            border: 1px solid transparent;
+            box-shadow: var(--shadow-1);
             position: relative;
             overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            inset: -60% -20% auto -20%;
+            height: 220%;
+            background: conic-gradient(from 120deg, rgba(26, 115, 232, 0.12), rgba(217, 48, 37, 0.1), rgba(249, 171, 0, 0.12), rgba(24, 128, 56, 0.12), rgba(26, 115, 232, 0.12));
+            opacity: 0.4;
+            animation: orbit 18s linear infinite;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-family: 'Noto Serif SC', 'Noto Serif', serif;
+            font-size: 2.4rem;
+            background: linear-gradient(110deg, var(--blue), var(--red), var(--yellow), var(--green));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: chroma 12s ease infinite;
+        }
+
+        .hero-desc {
+            margin-top: 10px;
+            font-size: 1.05rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+        }
+
+        .badge.blue { background: rgba(26, 115, 232, 0.12); color: var(--blue); }
+        .badge.red { background: rgba(217, 48, 37, 0.12); color: var(--red); }
+        .badge.yellow { background: rgba(249, 171, 0, 0.14); color: #b45309; }
+        .badge.green { background: rgba(24, 128, 56, 0.12); color: var(--green); }
+
+        .main-container {
+            width: min(1200px, 100% - 48px);
+            margin: 24px auto 64px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 120px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 22px;
+            padding: 20px;
+            border: 1px solid rgba(31, 31, 31, 0.08);
+            box-shadow: var(--shadow-1);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .nav-title {
+            font-size: 0.85rem;
+            color: var(--muted);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .nav-button {
+            position: relative;
+            padding: 14px 18px 14px 38px;
+            border-radius: 14px;
             text-decoration: none;
+            font-weight: 600;
+            background: var(--surface-2);
+            border: 1px solid rgba(31, 31, 31, 0.08);
+            color: var(--ink);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
         }
 
         .nav-button::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.4);
+            left: 16px;
+            top: 24px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+            background: var(--accent, var(--blue));
+            box-shadow: 0 0 0 6px rgba(26, 115, 232, 0.08);
+        }
+
+        .nav-label {
+            font-size: 1.05rem;
+        }
+
+        .nav-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            inset: -120% 0 auto -120%;
+            height: 220%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+            transform: translateX(-40%);
+            transition: transform 0.6s ease;
         }
 
         .nav-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-1);
+            background: var(--surface);
         }
 
-        .nav-button:hover::before {
-            width: 300px;
-            height: 300px;
+        .nav-button:hover::after {
+            transform: translateX(40%);
         }
 
         .nav-button:active {
-            transform: translateX(5px) scale(0.95);
+            transform: translateY(0) scale(0.98);
+        }
+
+        .nav-button:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
         }
 
         .content {
-            margin-left: 220px;
-            flex: 1;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .welcome-text {
-            color: white;
-            font-size: 2rem;
-            text-align: center;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-            opacity: 0.8;
+        .site-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
+        .site-card {
+            position: relative;
+            padding: 22px;
+            border-radius: 22px;
+            background:
+                linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(140deg, rgba(31, 31, 31, 0.12), rgba(31, 31, 31, 0.03)) border-box;
+            border: 1px solid transparent;
+            text-decoration: none;
+            color: var(--ink);
+            box-shadow: var(--shadow-1), 0 14px 32px var(--glow, rgba(0, 0, 0, 0));
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .site-card::after {
+            content: '';
+            position: absolute;
+            inset: -40% -30% auto -30%;
+            height: 220%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.7), transparent 60%);
+            opacity: 0.7;
+            transform: translateX(-20%);
+            transition: transform 0.6s ease;
+        }
+
+        .site-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-2), 0 18px 40px var(--glow, rgba(0, 0, 0, 0));
+        }
+
+        .site-card:hover::after {
+            transform: translateX(20%);
+        }
+
+        .site-card.muted {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px dashed rgba(31, 31, 31, 0.2);
+            box-shadow: none;
+        }
+
+        .site-title {
+            font-family: 'Noto Serif SC', 'Noto Serif', serif;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .site-desc {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .site-meta {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .site-chip {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            background: rgba(26, 115, 232, 0.1);
+            color: var(--blue);
+        }
+
+        .welcome-panel {
+            padding: 22px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(31, 31, 31, 0.08);
+            box-shadow: var(--shadow-1);
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        @keyframes sheen {
+            0% { transform: translateX(-5%); }
+            50% { transform: translateX(5%); }
+            100% { transform: translateX(-5%); }
+        }
+
+        @keyframes chroma {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes orbit {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 980px) {
+            .topbar-inner {
+                flex-direction: column;
+                align-items: flex-start;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
-        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
             .sidebar {
-                width: 180px;
-                padding: 20px;
-                gap: 20px;
+                position: relative;
+                top: 0;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .content {
-                margin-left: 180px;
-            }
-
-            .title {
-                font-size: 3rem;
-            }
-
-            .nav-button {
-                font-size: 1.3rem;
-                padding: 18px 20px;
-            }
-
-            .welcome-text {
-                font-size: 1.5rem;
+            .site-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 680px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
             .sidebar {
-                width: 140px;
-                padding: 15px;
-                gap: 15px;
+                grid-template-columns: 1fr;
             }
+        }
 
-            .content {
-                margin-left: 140px;
-            }
-
-            .title {
-                font-size: 2.2rem;
-            }
-
-            .nav-button {
-                font-size: 1.1rem;
-                padding: 15px 12px;
-            }
-
-            .welcome-text {
-                font-size: 1.2rem;
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
             }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="home-button">主页</a>
-
-    <div class="header">
-        <h1 class="title">轻小说</h1>
-    </div>
-
-    <div class="main-container">
-        <div class="sidebar">
-            <a href="https://www.esjzone.cc/" class="nav-button" target="_blank">ESJ</a>
-            <a href="https://masiro.me/admin" class="nav-button" target="_blank">真白萌</a>
-            <a href="https://www.lightnovel.fun/" class="nav-button" target="_blank">轻之国度</a>
-            <a href="#" class="nav-button">待添加</a>
-        </div>
-
-        <div class="content">
-            <div class="welcome-text">
-                欢迎来到小说世界<br>
-                请选择左侧的小说站点
+    <div class="page">
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <div class="brand-mark">
+                        <span class="dot-blue"></span>
+                        <span class="dot-red"></span>
+                        <span class="dot-yellow"></span>
+                        <span class="dot-green"></span>
+                    </div>
+                    <div class="brand-text">
+                        <div class="brand-title">轻小说</div>
+                        <div class="brand-subtitle">静享故事与灵感</div>
+                    </div>
+                </div>
+                <a href="index.html" class="home-button">返回主页</a>
             </div>
+        </header>
+
+        <section class="hero">
+            <div class="hero-card">
+                <div class="hero-title">轻小说图书馆</div>
+                <p class="hero-desc">将阅读入口与灵感索引并置，像书桌上的卡片一样清晰好用。</p>
+                <div class="hero-badges">
+                    <span class="badge blue">轻量导航</span>
+                    <span class="badge red">书单灵感</span>
+                    <span class="badge yellow">精选站点</span>
+                    <span class="badge green">持续更新</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="nav-title">导航站点</div>
+                <a href="https://www.esjzone.cc/" class="nav-button" target="_blank" style="--accent: var(--blue);">
+                    <span class="nav-label">ESJ</span>
+                    <span class="nav-desc">原创与同人轻小说</span>
+                </a>
+                <a href="https://masiro.me/admin" class="nav-button" target="_blank" style="--accent: var(--red);">
+                    <span class="nav-label">真白萌</span>
+                    <span class="nav-desc">轻小说社区入口</span>
+                </a>
+                <a href="https://www.lightnovel.fun/" class="nav-button" target="_blank" style="--accent: var(--yellow);">
+                    <span class="nav-label">轻之国度</span>
+                    <span class="nav-desc">经典书库与论坛</span>
+                </a>
+                <a href="#" class="nav-button" style="--accent: var(--green);">
+                    <span class="nav-label">待添加</span>
+                    <span class="nav-desc">下一站点预留</span>
+                </a>
+            </aside>
+
+            <main class="content">
+                <div class="site-grid">
+                    <a href="https://www.esjzone.cc/" class="site-card" target="_blank" style="--glow: rgba(26, 115, 232, 0.2);">
+                        <div class="site-title">ESJ Zone</div>
+                        <div class="site-desc">原创、同人、轻小说聚集地，适合深夜沉浸式阅读。</div>
+                        <div class="site-meta">
+                            <span class="site-chip">原创</span>
+                            <span class="site-chip">连载</span>
+                        </div>
+                    </a>
+                    <a href="https://masiro.me/admin" class="site-card" target="_blank" style="--glow: rgba(217, 48, 37, 0.18);">
+                        <div class="site-title">真白萌</div>
+                        <div class="site-desc">轻小说交流与发布平台，兼具社区与书库。</div>
+                        <div class="site-meta">
+                            <span class="site-chip">社区</span>
+                            <span class="site-chip">书库</span>
+                        </div>
+                    </a>
+                    <a href="https://www.lightnovel.fun/" class="site-card" target="_blank" style="--glow: rgba(249, 171, 0, 0.22);">
+                        <div class="site-title">轻之国度</div>
+                        <div class="site-desc">经典轻小说资源与论坛，适合查找热门与完结作品。</div>
+                        <div class="site-meta">
+                            <span class="site-chip">经典</span>
+                            <span class="site-chip">论坛</span>
+                        </div>
+                    </a>
+                    <a href="https://beta.noyteam.online/auth" class="site-card" target="_blank" style="--glow: rgba(24, 128, 56, 0.2);">
+                        <div class="site-title">noyacg</div>
+                        <div class="site-desc">二次元内容聚合与探索入口，适合收藏与灵感整理。</div>
+                        <div class="site-meta">
+                            <span class="site-chip">ACG</span>
+                            <span class="site-chip">探索</span>
+                        </div>
+                    </a>
+                    <div class="site-card muted">
+                        <div class="site-title">下一站点</div>
+                        <div class="site-desc">可以把你常去的轻小说站点加进来，打造专属书单入口。</div>
+                        <div class="site-meta">
+                            <span class="site-chip">待添加</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-panel">
+                    欢迎来到小说世界。这里更像一张精心排布的书桌：左侧是快捷入口，右侧是精选卡片。
+                    你可以把常看的站点都放进来，形成自己的阅读路径。
+                </div>
+            </main>
         </div>
     </div>
 </body>
